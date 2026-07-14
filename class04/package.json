@@ -1,0 +1,25 @@
+{
+  "name": "backend-bt-18",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/MRMutahir/backend-bt-18#readme",
+  "bugs": {
+    "url": "https://github.com/MRMutahir/backend-bt-18/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MRMutahir/backend-bt-18.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "node --watch index.js tsc --noEmit",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
