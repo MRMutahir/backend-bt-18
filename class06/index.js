@@ -1,8 +1,9 @@
 import { configDotenv } from "dotenv";
+configDotenv();
 import express from "express";
 import mongoose, { Mongoose } from "mongoose";
 import { UserRouter } from "./Routes/User.js";
-configDotenv();
+import rateLimit from "express-rate-limit"
 
 const app = express();
 async function main() {
@@ -14,13 +15,25 @@ async function main() {
   }
 }
 
-app.use(express.json());
 
 app.get("/", (req, res) => res.send("Ok"));
 
+app.use(express.json());
+app.use(rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes window
+  limit: 10, // Limit each IP to 100 requests per window
+  message: 'Too many requests from this IP, please try again later.', // Custom response text
+  statusCode: 429, // HTTP status code for "Too Many Requests" (default is 429)
+  standardHeaders: 'draft-8', // Return standard rate limit info in headers
+  legacyHeaders: false, // Disable the deprecated X-RateLimit-* headers
+}))
+
 app.use("/v1/users", UserRouter);
 
-app.listen(3000, () => {
+
+
+
+app.listen(3004, () => {
   main();
   console.log("server start");
 });

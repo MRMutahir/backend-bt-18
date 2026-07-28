@@ -25,7 +25,12 @@ const createUser = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  const result = await User.find({});
+  const { page, limit } = req.query
+  console.log(page, limit)
+
+  let skip = (page - 1) * limit
+  console.log(skip)
+  const result = await User.find({}).skip(skip).limit(limit)
   res.status(200).json({
     data: result,
   });
