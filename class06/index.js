@@ -4,6 +4,8 @@ import express from "express";
 import mongoose, { Mongoose } from "mongoose";
 import { UserRouter } from "./Routes/User.js";
 import rateLimit from "express-rate-limit"
+import { Schema } from "zod/v3";
+import { createUserSchema } from "./Validator/user.schema.js";
 
 const app = express();
 async function main() {
@@ -28,7 +30,32 @@ app.use(rateLimit({
   legacyHeaders: false, // Disable the deprecated X-RateLimit-* headers
 }))
 
-app.use("/v1/users", UserRouter);
+export const validate = (schema) => (req, res, next) => {
+  try {
+    // safeParse or parse evaluates the request data against your schema
+    schema.parse({
+      body: req.body,
+      query: req.query,
+      params: req.params,
+    });
+
+    next();
+  } catch (error) {
+    // Zod returns structured array errors inside error.errors
+    console.log(error.issues);
+
+
+    return res.status(400).json({
+      status: false,
+      // errors: error.issues[0],
+      field: error.issues[0].path[1],
+      message: error.issues[0].message
+    });
+  }
+};
+
+
+app.use("/v1/users", validate(createUserSchema), UserRouter);
 
 
 
