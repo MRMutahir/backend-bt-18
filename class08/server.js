@@ -4,6 +4,7 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import { AuthRoutes  } from "./Routes/Auth.js";
 import { UsersRoutes } from "./Routes/Users.Router.js";
+import { authenticateToken } from "./middleware/auth.js";
 
 
 // Connect to MongoDB
@@ -23,7 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/v1', AuthRoutes)
-app.use('/v1/users', UsersRoutes)
+app.use('/v1/users',  authenticateToken, UsersRoutes)
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,3 +1,4 @@
+import { accessToken } from "../config/jwt.js"
 import { comparePassword, passwordHash } from "../helper/helper.js"
 import { User } from "../Model/Users.Model.js"
 import jwt from "jsonwebtoken"
@@ -49,11 +50,14 @@ export const LoginController = async (req, res) => {
 
         if (checkPassword) {
 
-            console.log(process.env.JWT)
-            const token = jwt.sign({ email: getUser.email, id: getUser._id }, process.env.JWT, { expiresIn: '1h' });
-            return res.status(200).json({
-                data: token
+            const token = await accessToken({
+                _id: getUser._id,
+                email: getUser.email
             })
+
+            return res.json({
+                accessToken: token
+            }).status(200)
 
         } else {
             return res.status(200).json({
@@ -66,3 +70,5 @@ export const LoginController = async (req, res) => {
 
     }
 }
+
+

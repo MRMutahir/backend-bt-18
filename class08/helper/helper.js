@@ -15,7 +15,7 @@ export async function comparePassword(plainPassword, hashpassword) {
   try {
     //** plain password === hashpassword*/
     const isPassword = await bcrypt.compare(plainPassword, hashpassword);
-    console.log("isPassword >>>", isPassword)
+    
     return isPassword;
   } catch (err) {
     throw err;
