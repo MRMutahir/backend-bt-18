@@ -18,6 +18,6 @@ export async function comparePassword(plainPassword, hashpassword) {
     
     return isPassword;
   } catch (err) {
-    throw err;
+    console.log(err)
   }
 }
