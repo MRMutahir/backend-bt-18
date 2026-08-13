@@ -1,4 +1,5 @@
 // import { accessToken } from "../config/jwt.js"
+import { validationResult } from "express-validator";
 import { comparePassword, passwordHash } from "../helper/helper.js"
 import { User } from "../Model/Users.Model.js"
 import jwt from "jsonwebtoken"
@@ -6,7 +7,20 @@ import jwt from "jsonwebtoken"
 
 export const SignupController = async (req, res) => {
     try {
+
+        const result = validationResult(req);
+        console.log("result >>>", result)
+        return
+
+        if (!result.isEmpty()) {
+            console.log(result)
+            // handle validation errors
+            // return res.send('Please fix the request');
+        }
+
+        return
         let { email, password } = req.body
+
         const getUser = await User.findOne({
             email
         })
@@ -56,12 +70,12 @@ export const LoginController = async (req, res) => {
             const secretKey = process.env.JWT;
 
 
-            const accessToken = jwt.sign(payload, secretKey, { expiresIn: '1h' })
+            const accessToken = jwt.sign(payload, secretKey, { expiresIn: '1m' })
+            const refreshToken = jwt.sign(payload, secretKey, { expiresIn: '30d' })
 
-            return res.status(200).json({
-                message: "login successfully",
-                accessToken
-            })
+            res.cookie('token', refreshToken, { httpOnly: true, secure: true, });
+            return res.status(200).json({ message: "login successfully", accessToken });
+
         } else {
             return res.status(200).json({
                 message: "Invalid email and password"
@@ -75,3 +89,25 @@ export const LoginController = async (req, res) => {
 }
 
 
+
+
+
+export const refershTokenController = async (req, res) => {
+    const token = req.cookies.token;
+    jwt.verify(token, process.env.JWT, (err, decodedPayload) => {
+        if (err) {
+            console.log("errr >>", err)
+            return res.status(403).json({ message: 'Invalid or expired token.' });
+        }
+        console.log(decodedPayload)
+        const accessToken = jwt.sign({
+            email: decodedPayload.email,
+            _id: decodedPayload._id
+        }, process.env.JWT, { expiresIn: '1m' })
+
+
+        return res.status(200).json({
+            accessToken
+        })
+    });
+}
